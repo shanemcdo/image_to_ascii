@@ -44,6 +44,7 @@ def main():
     try:
         output_file = None
         scale = 1, 2
+        reverse = False
         sys.argv.pop(0)
         if not len(sys.argv):
             raise ValueError('Not enough arguments')
@@ -55,9 +56,12 @@ def main():
             elif sys.argv[i].lower() in ['-s', '--size']:
                 sys.argv.pop(i)
                 scale = float(sys.argv.pop(i)), float(sys.argv.pop(i))
+            elif sys.argv[i].lower() in ['-r', '--reverse']:
+                sys.argv.pop(i)
+                reverse = True
             else:
                 i += 1
-        ascii_image = convert_to_ascii(sys.argv[0], scale, LONG_SPARSE_TO_DENSE)
+        ascii_image = convert_to_ascii(sys.argv[0], scale, LONG_SPARSE_TO_DENSE[::-1] if reverse else LONG_SPARSE_TO_DENSE)
         if output_file:
             with open(output_file, 'w') as f:
                 f.write(ascii_image)
