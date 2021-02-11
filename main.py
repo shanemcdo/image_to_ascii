@@ -2,10 +2,10 @@ import numpy as np
 import sys
 from PIL import Image, ImageOps
 
-ASCII_SCALE = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
-ASCII_SCALE_LEN = len(ASCII_SCALE)
+LONG_SPARSE_TO_DENSE = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
+SHORT_SPARSE_TO_DENSE = ' .:-=+*#%@'
 
-def convert_to_ascii(filename: str, scale: (int, int)) -> str:
+def convert_to_ascii(filename: str, scale: (int, int), ascii_scale: str) -> str:
     """
     :filename: the name of the image to read
     :output_filename: [optional] the name of the text file to write to
@@ -22,12 +22,12 @@ def convert_to_ascii(filename: str, scale: (int, int)) -> str:
             brightest_pixel = max(cell, brightest_pixel)
             darkest_pixel = min(cell, darkest_pixel)
     brightness_diff = brightest_pixel - darkest_pixel
-    brightness_scaler = brightness_diff / (ASCII_SCALE_LEN - 1)
+    brightness_scaler = brightness_diff / (len(ascii_scale) - 1)
     f = lambda x: int((x - darkest_pixel) / brightness_scaler)
     output = ''
     for row in arr:
         for cell in row:
-            output += ASCII_SCALE[f(cell)]
+            output += ascii_scale[f(cell)]
         output += '\n'
     return output
 
@@ -56,7 +56,7 @@ def main():
                 scale = float(sys.argv.pop(i)), float(sys.argv.pop(i))
             else:
                 i += 1
-        ascii_image = convert_to_ascii(sys.argv[0], scale)
+        ascii_image = convert_to_ascii(sys.argv[0], scale, LONG_SPARSE_TO_DENSE)
         if output_file:
             with open(output_file, 'w') as f:
                 f.write(ascii_image)
