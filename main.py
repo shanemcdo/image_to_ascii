@@ -30,12 +30,19 @@ def convert_to_ascii(filename: str, scale: (int, int) = (1, 2)) -> str:
         output += '\n'
     return output
 
-def print_usage():
-    print("""img2ascii filename [flags]
-            flags:
-                -o or --output: the name of the outputfile
-
-            """)
+def main():
+    """
+    image_to_ascii - An app that converts images to ascii images
+        usage:
+            img2ascii {filename} [flags]
+        flags:
+            -o {output filename} or --output {output filname}: outputs a file with the passed name instead of printing
+            -s {width divisor} {height divisor} or --size {width divisor} {height divisor}: scales the height and width of the output
+    """
+    try:
+        ascii_image = convert_to_ascii('CursedCat.jpg')
+    except Exception as e:
+        print(f'Error {e}\n' + main.__doc__)
 
 if __name__ == '__main__':
-    ascii_image = convert_to_ascii('CursedCat.jpg')
+    main()
