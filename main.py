@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 from PIL import Image, ImageOps
 
 ASCII_SCALE = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
@@ -40,9 +41,14 @@ def main():
             -s {width divisor} {height divisor} or --size {width divisor} {height divisor}: scales the height and width of the output
     """
     try:
-        ascii_image = convert_to_ascii('CursedCat.jpg')
+        output_file = None
+        scale = 1, 2
+        sys.argv.pop(0)
+        if not len(sys.argv):
+            raise ValueError('Not enough arguments')
+        ascii_image = convert_to_ascii(sys.argv[0], scale)
     except Exception as e:
-        print(f'Error {e}\n' + main.__doc__)
+        print(f'Error: {e}\n' + main.__doc__)
 
 if __name__ == '__main__':
     main()
