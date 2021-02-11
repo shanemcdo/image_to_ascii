@@ -40,11 +40,13 @@ def main():
             -o {output filename} or --output {output filname}: outputs a file with the passed name instead of printing
             -s {width divisor} {height divisor} or --size {width divisor} {height divisor}: scales the height and width of the output
             -r or --reverse: reverses the ascii scale so the characters are the most dense where the image is the darkest (used for dark text on light background)
+            -b or --basic: use a less complex ascii scale
     """
     try:
         output_file = None
         scale = 1, 2
         reverse = False
+        ascii_scale = LONG_SPARSE_TO_DENSE
         sys.argv.pop(0)
         if not len(sys.argv):
             raise ValueError('Not enough arguments')
@@ -59,9 +61,12 @@ def main():
             elif sys.argv[i].lower() in ['-r', '--reverse']:
                 sys.argv.pop(i)
                 reverse = True
+            elif sys.argv[i].lower() in ['-b', '--basic']:
+                sys.argv.pop(i)
+                ascii_scale = SHORT_SPARSE_TO_DENSE
             else:
                 i += 1
-        ascii_image = convert_to_ascii(sys.argv[0], scale, LONG_SPARSE_TO_DENSE[::-1] if reverse else LONG_SPARSE_TO_DENSE)
+        ascii_image = convert_to_ascii(sys.argv[0], scale, ascii_scale[::-1] if reverse else ascii_scale)
         if output_file:
             with open(output_file, 'w') as f:
                 f.write(ascii_image)
