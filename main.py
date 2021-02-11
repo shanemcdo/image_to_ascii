@@ -5,7 +5,7 @@ from PIL import Image, ImageOps
 ASCII_SCALE = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
 ASCII_SCALE_LEN = len(ASCII_SCALE)
 
-def convert_to_ascii(filename: str, scale: (int, int) = (1, 2)) -> str:
+def convert_to_ascii(filename: str, scale: (int, int)) -> str:
     """
     :filename: the name of the image to read
     :output_filename: [optional] the name of the text file to write to
