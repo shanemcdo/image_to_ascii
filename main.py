@@ -4,7 +4,7 @@ from PIL import Image, ImageOps
 ASCII_SCALE = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
 ASCII_SCALE_LEN = len(ASCII_SCALE)
 
-def convert_to_ascii(filename: str, output_filename: str = None, scale: (int, int) = (1, 2)) -> str:
+def convert_to_ascii(filename: strscale: (int, int) = (1, 2)) -> str:
     """
     :filename: the name of the image to read
     :output_filename: [optional] the name of the text file to write to
@@ -23,11 +23,19 @@ def convert_to_ascii(filename: str, output_filename: str = None, scale: (int, in
     brightness_diff = brightest_pixel - darkest_pixel
     brightness_scaler = brightness_diff / (ASCII_SCALE_LEN - 1)
     f = lambda x: int((x - darkest_pixel) / brightness_scaler)
-    with open(output_filename if output_filename else '.'.join(filename.split('.')[:-1]) + '.txt', 'w') as file:
-        for row in arr:
-            for cell in row:
-                file.write(ASCII_SCALE[f(cell)])
-            file.write('\n')
+    output = ''
+    for row in arr:
+        for cell in row:
+            output += ASCII_SCALE[f(cell)]
+        output += '\n'
+    return output
+
+def print_usage():
+    print("""img2ascii filename [flags]
+            flags:
+                -o or --output: the name of the outputfile
+
+            """)
 
 if __name__ == '__main__':
-    convert_to_ascii('CursedCat.jpg')
+    ascii_image = convert_to_ascii('CursedCat.jpg')
