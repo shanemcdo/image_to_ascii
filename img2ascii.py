@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import numpy as np
-import sys
 import argparse
 from PIL import Image, ImageOps
 from typing import Tuple
