@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import sys
 from PIL import Image, ImageOps
@@ -23,6 +25,8 @@ def convert_to_ascii(filename: str, scale: (int, int), ascii_scale: str) -> str:
             darkest_pixel = min(cell, darkest_pixel)
     brightness_diff = brightest_pixel - darkest_pixel
     brightness_scaler = brightness_diff / (len(ascii_scale) - 1)
+    if brightness_scaler == 0:
+         brightness_scaler = 1
     f = lambda x: int((x - darkest_pixel) / brightness_scaler)
     output = ''
     for row in arr:
