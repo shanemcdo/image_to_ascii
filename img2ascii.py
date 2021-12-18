@@ -2,7 +2,9 @@
 
 import numpy as np
 import sys
+import argparse
 from PIL import Image, ImageOps
+from typing import Tuple
 
 LONG_SPARSE_TO_DENSE = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
 SHORT_SPARSE_TO_DENSE = ' .:-=+*#%@'
@@ -46,38 +48,52 @@ def main():
             -r or --reverse: reverses the ascii scale so the characters are the most dense where the image is the darkest (used for dark text on light background)
             -b or --basic: use a less complex ascii scale
     """
-    try:
-        output_file = None
-        scale = 1, 2
-        reverse = False
-        ascii_scale = LONG_SPARSE_TO_DENSE
-        sys.argv.pop(0)
-        if not len(sys.argv):
-            raise ValueError('Not enough arguments')
-        i = 0
-        while i < len(sys.argv):
-            if sys.argv[i].lower() in ['-o', '--output']:
-                sys.argv.pop(i)
-                output_file = sys.argv.pop(i)
-            elif sys.argv[i].lower() in ['-s', '--size']:
-                sys.argv.pop(i)
-                scale = float(sys.argv.pop(i)), float(sys.argv.pop(i))
-            elif sys.argv[i].lower() in ['-r', '--reverse']:
-                sys.argv.pop(i)
-                reverse = True
-            elif sys.argv[i].lower() in ['-b', '--basic']:
-                sys.argv.pop(i)
-                ascii_scale = SHORT_SPARSE_TO_DENSE
-            else:
-                i += 1
-        ascii_image = convert_to_ascii(sys.argv[0], scale, ascii_scale[::-1] if reverse else ascii_scale)
-        if output_file:
-            with open(output_file, 'w') as f:
-                f.write(ascii_image)
-        else:
-            print(ascii_image)
-    except Exception as e:
-        print(f'Error: {e}\n' + main.__doc__)
+    ascii_scale = LONG_SPARSE_TO_DENSE
+    parser = argparse.ArgumentParser('img2ascii', description='Converts an image into ascii text')
+    parser.add_argument(
+        'filename',
+        type=str,
+        help='The name of the input file'
+    )
+    parser.add_argument(
+        '-o',
+        '--output',
+        type=str,
+        help='The name of the output file'
+    )
+    parser.add_argument(
+        '-s',
+        '--scale',
+        type=float,
+        nargs=2,
+        default=[1.0, 2.0],
+        help='Scale x and y of image'
+    )
+    parser.add_argument(
+        '-b',
+        '--basic',
+        action="store_true",
+        help='Use more basic ascii scale'
+    )
+    parser.add_argument(
+        '-r',
+        '--reverse',
+        action="store_true",
+        help='Reverse ascii scale'
+    )
+    args = parser.parse_args()
+    if args.basic:
+        ascii_scale = SHORT_SPARSE_TO_DENSE
+    ascii_image = convert_to_ascii(
+        args.filename,
+        args.scale,
+        ascii_scale[::-1] if args.reverse else ascii_scale
+    )
+    if args.output:
+        with open(args.output, 'w') as f:
+            f.write(ascii_image)
+    else:
+        print(ascii_image)
 
 if __name__ == '__main__':
     main()
