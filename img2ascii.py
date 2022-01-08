@@ -66,7 +66,6 @@ def main():
         type=float,
         metavar=('X_SCALE', 'Y_SCALE'),
         nargs=2,
-
         default=[1.0, 2.0],
         help='Scale x and y of image'
     )
