@@ -19,10 +19,10 @@ def convert_to_ascii_color(filename: str, scale: (int, int), ascii_scale: str) -
     arr = np.array(img)
     output = ''
     for row in arr:
-        for r, g, b in row:
-            output += f'\033[38;2;{r};{g};{b}m#'
+        for r, g, b, *rest in row:
+            output += f'\033[48;2;{r};{g};{b}m '
         output += '\n'
-    return output
+    return output + '\033[0m'
 
 def convert_to_ascii_grayscale(filename: str, scale: (int, int), ascii_scale: str) -> str:
     """
