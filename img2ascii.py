@@ -18,9 +18,14 @@ def convert_to_ascii_color(filename: str, scale: (int, int), ascii_scale: str) -
     img = img.resize((int(width // scale[0]), int(height // scale[1])))
     arr = np.array(img)
     output = ''
+    prev = None
     for row in arr:
         for r, g, b, *rest in row:
-            output += f'\033[48;2;{r};{g};{b}m '
+            color = f'\033[48;2;{r};{g};{b}m'
+            if prev != color:
+                prev = color
+                output += color
+            output += ' '
         output += '\n'
     return output + '\033[0m'
 
