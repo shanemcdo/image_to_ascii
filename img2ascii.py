@@ -8,6 +8,9 @@ from typing import Tuple
 LONG_SPARSE_TO_DENSE = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
 SHORT_SPARSE_TO_DENSE = ' .:-=+*#%@'
 
+def color_str(r: int, g: int, b: int) -> str:
+    return f'\033[48;2;{r};{g};{b}m'
+
 def convert_to_ascii_color(filename: str, scale: int, ascii_scale: str) -> str:
     """
     :filename: the name of the image to read
@@ -20,8 +23,14 @@ def convert_to_ascii_color(filename: str, scale: int, ascii_scale: str) -> str:
     output = ''
     prev = None
     for row in arr:
-        for r, g, b, *rest in row:
-            color = f'\033[48;2;{r};{g};{b}m'
+        for cell in row:
+            if isinstance(cell, np.ndarray):
+                r, g, b, *rest = cell
+                color = color_str(r, g, b)
+            elif isinstance(cell, np.uint8):
+                color = color_str(cell, cell, cell)
+            else:
+                raise ValueError(f'Unexpected Value {cell}')
             if prev != color:
                 prev = color
                 output += color
