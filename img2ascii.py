@@ -11,7 +11,7 @@ SHORT_SPARSE_TO_DENSE = ' .:-=+*#%@'
 def color_str(r: int, g: int, b: int) -> str:
     return f'\033[48;2;{r};{g};{b}m'
 
-def convert_to_ascii_color(filename: str, scale: int, ascii_scale: str) -> str:
+def convert_to_ascii_color(filename: str, scale: int) -> str:
     """
     :filename: the name of the image to read
     :output_filename: [optional] the name of the text file to write to
@@ -28,6 +28,7 @@ def convert_to_ascii_color(filename: str, scale: int, ascii_scale: str) -> str:
                 r, g, b, *rest = cell
                 color = color_str(r, g, b)
             elif isinstance(cell, np.uint8):
+                cell *= 255
                 color = color_str(cell, cell, cell)
             else:
                 raise ValueError(f'Unexpected Value {cell}')
