@@ -8,14 +8,14 @@ from typing import Tuple
 LONG_SPARSE_TO_DENSE = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
 SHORT_SPARSE_TO_DENSE = ' .:-=+*#%@'
 
-def convert_to_ascii_color(filename: str, scale: (int, int), ascii_scale: str) -> str:
+def convert_to_ascii_color(filename: str, scale: int, ascii_scale: str) -> str:
     """
     :filename: the name of the image to read
     :output_filename: [optional] the name of the text file to write to
     """
     img = Image.open(filename)
     width, height = img.size
-    img = img.resize((int(width // scale[0]), int(height // scale[1])))
+    img = img.resize((int(width // scale * 2), int(height // scale)))
     arr = np.array(img)
     output = ''
     prev = None
@@ -29,7 +29,7 @@ def convert_to_ascii_color(filename: str, scale: (int, int), ascii_scale: str) -
         output += '\n'
     return output + '\033[0m'
 
-def convert_to_ascii_grayscale(filename: str, scale: (int, int), ascii_scale: str) -> str:
+def convert_to_ascii_grayscale(filename: str, scale: int, ascii_scale: str) -> str:
     """
     :filename: the name of the image to read
     :output_filename: [optional] the name of the text file to write to
@@ -37,7 +37,7 @@ def convert_to_ascii_grayscale(filename: str, scale: (int, int), ascii_scale: st
     img = Image.open(filename)
     img = ImageOps.grayscale(img)
     width, height = img.size
-    img = img.resize((int(width // scale[0]), int(height // scale[1])))
+    img = img.resize((int(width // scale * 2), int(height // scale)))
     arr = np.array(img)
     brightest_pixel = -1
     darkest_pixel = 99999
@@ -86,9 +86,7 @@ def main():
         '-s',
         '--scale',
         type=float,
-        metavar=('X_SCALE', 'Y_SCALE'),
-        nargs=2,
-        default=[1.0, 2.0],
+        default=1.0,
         help='Scale x and y of image'
     )
     parser.add_argument(
