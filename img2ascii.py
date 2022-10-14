@@ -62,8 +62,12 @@ def convert_to_ascii(img: Image, args) -> str:
     if args.basic:
         ascii_scale = SHORT_SPARSE_TO_DENSE
     if args.auto:
-        size = min(get_terminal_size())
-        img = img.resize((size * 2, size))
+        term_size = get_terminal_size()
+        if img.size[0] > img.size[1] * 2:
+            new_size = (term_size[0], int(term_size[0] / img.size[0] * img.size[1] / 2))
+        else:
+            new_size = (int(term_size[1] / img.size[1] * img.size[0] * 2), term_size[1])
+        img = img.resize(new_size)
     elif args.stretch:
         img = img.resize(get_terminal_size())
     else:
