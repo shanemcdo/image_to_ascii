@@ -11,14 +11,12 @@ SHORT_SPARSE_TO_DENSE = ' .:-=+*#%@'
 def color_str(r: int, g: int, b: int) -> str:
     return f'\033[48;2;{r};{g};{b}m'
 
-def convert_to_ascii_color(filename: str, scale: int) -> str:
-    """
-    :filename: the name of the image to read
-    :output_filename: [optional] the name of the text file to write to
-    """
+def get_image(filename: str, scale: int) -> Image:
     img = Image.open(filename)
     width, height = img.size
-    img = img.resize((int(width // scale * 2), int(height // scale)))
+    return img.resize((int(width // scale * 2), int(height // scale)))
+
+def convert_to_ascii_color(img: Image) -> str:
     img = img.convert('RGB')
     arr = np.array(img)
     output = ''
@@ -33,15 +31,8 @@ def convert_to_ascii_color(filename: str, scale: int) -> str:
         output += '\n'
     return output + '\033[0m'
 
-def convert_to_ascii_grayscale(filename: str, scale: int, ascii_scale: str) -> str:
-    """
-    :filename: the name of the image to read
-    :output_filename: [optional] the name of the text file to write to
-    """
-    img = Image.open(filename)
+def convert_to_ascii_grayscale(img: Image, ascii_scale: str) -> str:
     img = ImageOps.grayscale(img)
-    width, height = img.size
-    img = img.resize((int(width // scale * 2), int(height // scale)))
     arr = np.array(img)
     brightest_pixel = -1
     darkest_pixel = 99999
@@ -61,19 +52,7 @@ def convert_to_ascii_grayscale(filename: str, scale: int, ascii_scale: str) -> s
         output += '\n'
     return output
 
-def main():
-    """
-    image_to_ascii - An app that converts images to ascii images
-        usage:
-            img2ascii {filename} [flags]
-        flags:
-            -o {output filename} or --output {output filname}: outputs a file with the passed name instead of printing
-            -s {width divisor} {height divisor} or --size {width divisor} {height divisor}: scales the height and width of the output
-            -r or --reverse: reverses the ascii scale so the characters are the most dense where the image is the darkest (used for dark text on light background)
-            -b or --basic: use a less complex ascii scale
-            -c or --color: use colors
-    """
-    ascii_scale = LONG_SPARSE_TO_DENSE
+def parse_args():
     parser = argparse.ArgumentParser('img2ascii', description='Converts an image into ascii text')
     parser.add_argument(
         'filename',
@@ -111,18 +90,19 @@ def main():
         action='store_true',
         help='use colors'
     )
-    args = parser.parse_args()
+    return parser.parse_args()
+
+def main():
+    ascii_scale = LONG_SPARSE_TO_DENSE
+    args = parse_args()
     if args.basic:
         ascii_scale = SHORT_SPARSE_TO_DENSE
+    img = get_image(args.filename, args.scale)
     if args.color:
-        ascii_image = convert_to_ascii_color(
-            args.filename,
-            args.scale
-        )
+        ascii_image = convert_to_ascii_color(img)
     else:
         ascii_image = convert_to_ascii_grayscale(
-            args.filename,
-            args.scale,
+            img,
             ascii_scale[::-1] if args.reverse else ascii_scale
         )
     if args.output:
