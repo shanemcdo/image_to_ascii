@@ -11,11 +11,6 @@ SHORT_SPARSE_TO_DENSE = ' .:-=+*#%@'
 def color_str(r: int, g: int, b: int) -> str:
     return f'\033[48;2;{r};{g};{b}m'
 
-def get_image(filename: str, scale: int) -> Image:
-    img = Image.open(filename)
-    width, height = img.size
-    return img.resize((int(width // scale * 2), int(height // scale)))
-
 def convert_to_ascii_color(img: Image) -> str:
     img = img.convert('RGB')
     arr = np.array(img)
@@ -51,6 +46,20 @@ def convert_to_ascii_grayscale(img: Image, ascii_scale: str) -> str:
             output += ascii_scale[f(cell)]
         output += '\n'
     return output
+
+def convert_to_ascii(img: Image, args) -> str:
+    ascii_scale = LONG_SPARSE_TO_DENSE
+    if args.basic:
+        ascii_scale = SHORT_SPARSE_TO_DENSE
+    width, height = img.size
+    img =  img.resize((int(width // args.scale * 2), int(height // args.scale)))
+    if args.color:
+        return convert_to_ascii_color(img)
+    else:
+        return convert_to_ascii_grayscale(
+            img,
+            ascii_scale[::-1] if args.reverse else ascii_scale
+        )
 
 def parse_args():
     parser = argparse.ArgumentParser('img2ascii', description='Converts an image into ascii text')
@@ -93,18 +102,9 @@ def parse_args():
     return parser.parse_args()
 
 def main():
-    ascii_scale = LONG_SPARSE_TO_DENSE
     args = parse_args()
-    if args.basic:
-        ascii_scale = SHORT_SPARSE_TO_DENSE
-    img = get_image(args.filename, args.scale)
-    if args.color:
-        ascii_image = convert_to_ascii_color(img)
-    else:
-        ascii_image = convert_to_ascii_grayscale(
-            img,
-            ascii_scale[::-1] if args.reverse else ascii_scale
-        )
+    img = Image.open(args.filename)
+    ascii_image = convert_to_ascii(img, args)
     if args.output:
         with open(args.output, 'w') as f:
             f.write(ascii_image)
