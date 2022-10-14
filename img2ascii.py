@@ -52,7 +52,7 @@ def convert_to_ascii(img: Image, args) -> str:
     if args.basic:
         ascii_scale = SHORT_SPARSE_TO_DENSE
     width, height = img.size
-    img =  img.resize((int(width // args.scale * 2), int(height // args.scale)))
+    img = img.resize((int(width // args.scale * 2), int(height // args.scale)))
     if args.color:
         return convert_to_ascii_color(img)
     else:
