@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-#TODO: add ability to set size based on term size
-
 import numpy as np
 import argparse
 from os import get_terminal_size
@@ -10,6 +8,7 @@ from time import sleep
 
 LONG_SPARSE_TO_DENSE = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
 SHORT_SPARSE_TO_DENSE = ' .:-=+*#%@'
+RESET_FORMATTING = '\033[0m'
 
 
 def hide_cursor():
@@ -33,8 +32,9 @@ def convert_to_ascii_color(img: Image) -> str:
                 prev = color
                 output += color
             output += ' '
-        output += '\n'
-    return output[:-1] + '\033[0m'
+        output += RESET_FORMATTING + '\n'
+        prev = None
+    return output[:-1] + RESET_FORMATTING
 
 def convert_to_ascii_grayscale(img: Image, ascii_scale: str) -> str:
     img = ImageOps.grayscale(img)
