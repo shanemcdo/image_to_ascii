@@ -4,6 +4,7 @@
 
 import numpy as np
 import argparse
+from os import get_terminal_size
 from PIL import Image, ImageOps
 from time import sleep
 
@@ -33,7 +34,7 @@ def convert_to_ascii_color(img: Image) -> str:
                 output += color
             output += ' '
         output += '\n'
-    return output + '\033[0m'
+    return output[:-1] + '\033[0m'
 
 def convert_to_ascii_grayscale(img: Image, ascii_scale: str) -> str:
     img = ImageOps.grayscale(img)
@@ -54,17 +55,21 @@ def convert_to_ascii_grayscale(img: Image, ascii_scale: str) -> str:
         for cell in row:
             output += ascii_scale[f(cell)]
         output += '\n'
-    return output
-
-def resize(img: Image, scale: float) -> Image:
-    width, height = img.size
-    return img.resize((int(width / scale * 2), int(height / scale)))
+    return output[:-1]
 
 def convert_to_ascii(img: Image, args) -> str:
     ascii_scale = LONG_SPARSE_TO_DENSE
     if args.basic:
         ascii_scale = SHORT_SPARSE_TO_DENSE
-    img = resize(img, args.scale)
+    if args.auto:
+        size = min(get_terminal_size())
+        img = img.resize((size * 2, size))
+    elif args.stretch:
+        width, height = get_terminal_size()
+        img = img.resize((width, height))
+    else:
+        width, height = img.size
+        img = img.resize((int(width / args.scale * 2), int(height / args.scale)))
     if args.color:
         return convert_to_ascii_color(img)
     else:
@@ -118,6 +123,18 @@ def parse_args():
         default=0.1,
         help='Delay for displaying gifs in seconds'
     )
+    parser.add_argument(
+        '-a',
+        '--auto',
+        action='store_true',
+        help='automatically resize image to what fits the terminal. preserves aspect ratio'
+    )
+    parser.add_argument(
+        '-S',
+        '--stretch',
+        action='store_true',
+        help='automatically resize image to what fits the terminal. doesn\'t preserve aspect ratio'
+    )
     return parser.parse_args()
 
 def main():
@@ -138,14 +155,14 @@ def main():
         if args.output:
             with open(args.output, 'w') as f:
                 for frame in frames:
-                    f.write(frame + '\n')
+                    f.write(frame + '\n\n')
         else:
             hide_cursor()
             try:
                 while True:
                     for frame in frames:
                         # escape code goes to positon 1 1 on screen
-                        print('\033[1;1H' + frame)
+                        print('\033[1;1H' + frame, end='')
                         sleep(args.delay)
             except KeyboardInterrupt:
                 show_cursor()
