@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+#TODO: add ability to set size based on term size
+
 import numpy as np
 import argparse
 from PIL import Image, ImageOps
