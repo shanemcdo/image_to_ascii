@@ -19,19 +19,13 @@ def convert_to_ascii_color(filename: str, scale: int) -> str:
     img = Image.open(filename)
     width, height = img.size
     img = img.resize((int(width // scale * 2), int(height // scale)))
+    img = img.convert('RGB')
     arr = np.array(img)
     output = ''
     prev = None
     for row in arr:
-        for cell in row:
-            if isinstance(cell, np.ndarray):
-                r, g, b, *rest = cell
-                color = color_str(r, g, b)
-            elif isinstance(cell, np.uint8):
-                cell *= 255
-                color = color_str(cell, cell, cell)
-            else:
-                raise ValueError(f'Unexpected Value {cell}')
+        for r, g, b in row:
+            color = color_str(r, g, b)
             if prev != color:
                 prev = color
                 output += color
@@ -123,8 +117,7 @@ def main():
     if args.color:
         ascii_image = convert_to_ascii_color(
             args.filename,
-            args.scale,
-            ascii_scale[::-1] if args.reverse else ascii_scale
+            args.scale
         )
     else:
         ascii_image = convert_to_ascii_grayscale(
