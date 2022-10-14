@@ -65,8 +65,7 @@ def convert_to_ascii(img: Image, args) -> str:
         size = min(get_terminal_size())
         img = img.resize((size * 2, size))
     elif args.stretch:
-        width, height = get_terminal_size()
-        img = img.resize((width, height))
+        img = img.resize(get_terminal_size())
     else:
         width, height = img.size
         img = img.resize((int(width / args.scale * 2), int(height / args.scale)))
