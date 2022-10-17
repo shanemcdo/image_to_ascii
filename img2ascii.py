@@ -24,8 +24,8 @@ def convert_to_ascii_color(img: Image) -> str:
     img = img.convert('RGB')
     arr = np.array(img)
     output = ''
-    prev = None
     for row in arr:
+        prev = None
         for r, g, b in row:
             color = color_str(r, g, b)
             if prev != color:
@@ -33,7 +33,6 @@ def convert_to_ascii_color(img: Image) -> str:
                 output += color
             output += ' '
         output += RESET_FORMATTING + '\n'
-        prev = None
     return output[:-1] + RESET_FORMATTING
 
 def convert_to_ascii_grayscale(img: Image, ascii_scale: str) -> str:
