@@ -59,9 +59,6 @@ def convert_to_ascii_grayscale(img: Image, ascii_scale: str) -> str:
     return output[:-1]
 
 def convert_to_ascii(img: Image, args) -> str:
-    ascii_scale = LONG_SPARSE_TO_DENSE
-    if args.basic:
-        ascii_scale = SHORT_SPARSE_TO_DENSE
     if args.auto:
         term_size = get_terminal_size()
         if img.size[0] > img.size[1] * 2:
@@ -77,6 +74,7 @@ def convert_to_ascii(img: Image, args) -> str:
     if args.color:
         return convert_to_ascii_color(img)
     else:
+        ascii_scale = SHORT_SPARSE_TO_DENSE if args.basic else LONG_SPARSE_TO_DENSE
         return convert_to_ascii_grayscale(
             img,
             ascii_scale[::-1] if args.reverse else ascii_scale
