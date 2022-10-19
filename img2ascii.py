@@ -2,9 +2,11 @@
 
 import numpy as np
 import argparse
+import requests
 from os import get_terminal_size
 from PIL import Image, ImageOps
 from time import sleep
+from tempfile import TemporaryFile
 
 LONG_SPARSE_TO_DENSE = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
 SHORT_SPARSE_TO_DENSE = ' .:-=+*#%@'
@@ -141,7 +143,15 @@ def parse_args():
 
 def main():
     args = parse_args()
-    img = Image.open(args.filename)
+    if args.filename.startswith('https://') or args.filename.startswith('http://'):
+        file = TemporaryFile()
+        res = requests.get(args.filename)
+        if res.status_code != 200:
+            raise ValueError(f'Could not get url: "{args.filename}"\nstatus code: {res.status_code}')
+        file.write(res.content)
+    else:
+        file = args.filename
+    img = Image.open(file)
     if not getattr(img, 'is_animated', False):
         ascii_image = convert_to_ascii(img, args)
         if args.output:
