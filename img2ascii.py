@@ -141,17 +141,20 @@ def parse_args():
     )
     return parser.parse_args()
 
-def main():
-    args = parse_args()
-    if args.filename.startswith('https://') or args.filename.startswith('http://'):
+def get_image(filename: str) -> Image:
+    if filename.startswith('https://') or filename.startswith('http://'):
         file = TemporaryFile()
-        res = requests.get(args.filename)
+        res = requests.get(filename)
         if res.status_code != 200:
-            raise ValueError(f'Could not get url: "{args.filename}"\nstatus code: {res.status_code}')
+            raise ValueError(f'Could not get url: "{filename}"\nstatus code: {res.status_code}')
         file.write(res.content)
     else:
-        file = args.filename
-    img = Image.open(file)
+        file = filename
+    return Image.open(file)
+
+def main():
+    args = parse_args()
+    img = get_image(args.filename)
     if not getattr(img, 'is_animated', False):
         ascii_image = convert_to_ascii(img, args)
         if args.output:
