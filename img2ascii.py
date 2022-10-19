@@ -82,6 +82,35 @@ def convert_to_ascii(img: Image, args) -> str:
             ascii_scale[::-1] if args.reverse else ascii_scale
         )
 
+def convert_image(img: Image, args):
+    ascii_image = convert_to_ascii(img, args)
+    if args.output:
+        with open(args.output, 'w') as f:
+            f.write(ascii_image)
+    else:
+        print(ascii_image)
+
+
+def convert_gif(img: Image, args):
+    frames = []
+    for i in range(img.n_frames):
+        img.seek(i)
+        frames.append(convert_to_ascii(img, args))
+    if args.output:
+        with open(args.output, 'w') as f:
+            for frame in frames:
+                f.write(frame + '\n\n')
+    else:
+        hide_cursor()
+        try:
+            while True:
+                for frame in frames:
+                    # escape code goes to positon 1 1 on screen
+                    print('\033[1;1H' + frame, end='')
+                    sleep(args.delay)
+        except KeyboardInterrupt:
+            show_cursor()
+
 def parse_args():
     parser = argparse.ArgumentParser('img2ascii', description='Converts an image or gif into ascii text')
     parser.add_argument(
@@ -156,31 +185,9 @@ def main():
     args = parse_args()
     img = get_image(args.filename)
     if not getattr(img, 'is_animated', False):
-        ascii_image = convert_to_ascii(img, args)
-        if args.output:
-            with open(args.output, 'w') as f:
-                f.write(ascii_image)
-        else:
-            print(ascii_image)
+        convert_image(img, args)
     else:
-        frames = []
-        for i in range(img.n_frames):
-            img.seek(i)
-            frames.append(convert_to_ascii(img, args))
-        if args.output:
-            with open(args.output, 'w') as f:
-                for frame in frames:
-                    f.write(frame + '\n\n')
-        else:
-            hide_cursor()
-            try:
-                while True:
-                    for frame in frames:
-                        # escape code goes to positon 1 1 on screen
-                        print('\033[1;1H' + frame, end='')
-                        sleep(args.delay)
-            except KeyboardInterrupt:
-                show_cursor()
+        convert_gif(img, args)
 
 if __name__ == '__main__':
     main()
