@@ -60,6 +60,7 @@ def convert_to_ascii_grayscale(img: Image, ascii_scale: str) -> str:
 
 def convert_to_ascii(img: Image, args) -> str:
     if args.auto:
+        # TODO: doesn't work with img2ascii "https://media.giphy.com/media/8scSaaxBspqRG/giphy.gif" -ca
         term_size = get_terminal_size()
         if img.size[0] > img.size[1] * 2:
             new_size = (term_size[0], int(term_size[0] / img.size[0] * img.size[1] / 2))
