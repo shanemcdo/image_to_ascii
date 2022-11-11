@@ -179,6 +179,9 @@ def parse_args():
     args = parser.parse_args()
     if args.clipboard:
         args.filename = clipboard.paste()
+        if args.filename == '':
+            print(f'{program_name}: error: clipboard is an invalid input: {args.filename!r}', file = sys.stderr)
+            sys.exit(1)
         return args
     parser.add_argument(
         'filename',
@@ -200,7 +203,6 @@ def get_image(filename: str) -> Image:
         file.write(res.content)
     else:
         file = filename
-    print(f'{file = }')
     return Image.open(file)
 
 def main():
