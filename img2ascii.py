@@ -115,6 +115,12 @@ def parse_args():
     program_name = 'img2ascii'
     parser = argparse.ArgumentParser(program_name, description='Converts an image or gif into ascii text')
     parser.add_argument(
+        'filename',
+        type=str,
+        nargs='?',
+        help='The name of the input file'
+    )
+    parser.add_argument(
         '-o',
         '--output',
         type=str,
@@ -168,7 +174,7 @@ def parse_args():
         '-C',
         '--clipboard',
         action='store_true',
-        help='Use the clipboard instead of input provided'
+        help='Use the clipboard instead of input provided. filename is optional if this is passed'
     )
     args = parser.parse_args()
     if args.clipboard:
