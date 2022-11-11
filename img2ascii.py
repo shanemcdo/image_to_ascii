@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
+import clipboard
 import numpy as np
 import argparse
 import requests
+import sys
 from os import get_terminal_size
 from PIL import Image, ImageOps
 from time import sleep
@@ -110,12 +112,8 @@ def convert_gif(img: Image, args):
             show_cursor()
 
 def parse_args():
-    parser = argparse.ArgumentParser('img2ascii', description='Converts an image or gif into ascii text')
-    parser.add_argument(
-        'filename',
-        type=str,
-        help='The name of the input file'
-    )
+    program_name = 'img2ascii'
+    parser = argparse.ArgumentParser(program_name, description='Converts an image or gif into ascii text')
     parser.add_argument(
         '-o',
         '--output',
@@ -166,7 +164,23 @@ def parse_args():
         action='store_true',
         help='automatically resize image to what fits the terminal. doesn\'t preserve aspect ratio'
     )
-    return parser.parse_args()
+    parser.add_argument(
+        '-C',
+        '--clipboard',
+        action='store_true',
+        help='Use the clipboard instead of input provided'
+    )
+    args = parser.parse_args()
+    if args.clipboard:
+        args.filename = clipboard.paste()
+        return args
+    parser.add_argument(
+        'filename',
+        type=str,
+        help='The name of the input file'
+    )
+    args = parser.parse_args()
+    return args
 
 def get_image(filename: str) -> Image:
     if filename.startswith('https://') or filename.startswith('http://'):
