@@ -14,21 +14,6 @@ LONG_SPARSE_TO_DENSE = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqp
 SHORT_SPARSE_TO_DENSE = ' .:-=+*#%@'
 RESET_FORMATTING = '\033[0m'
 
-
-def remove_argument(parser: argparse.ArgumentParser, arg: str):
-    '''https://stackoverflow.com/questions/32807319/disable-remove-argument-in-argparse'''
-    for action in parser._actions:
-        opts = action.option_strings
-        if (opts and opts[0] == arg) or action.dest == arg:
-            parser._remove_action(action)
-            break
-    for action in parser._action_groups:
-        for group_action in action._group_actions:
-            if group_action.dest == arg:
-                action._group_actions.remove(group_action)
-                return
-
-
 def hide_cursor():
     print('\033[?25l', end='')
 
@@ -125,15 +110,22 @@ def convert_gif(img: Image, args):
         except KeyboardInterrupt:
             show_cursor()
 
-def parse_args():
+def get_args(require_filename: bool) -> argparse.Namespace:
     program_name = 'img2ascii'
     parser = argparse.ArgumentParser(program_name, description='Converts an image or gif into ascii text')
-    parser.add_argument(
-        'filename',
-        type=str,
-        nargs='?',
-        help='The name of the input file'
-    )
+    if require_filename:
+        parser.add_argument(
+            'filename',
+            type=str,
+            help='The name of the input file'
+        )
+    else:
+        parser.add_argument(
+            'filename',
+            type=str,
+            nargs='?',
+            help='The name of the input file'
+        )
     parser.add_argument(
         '-o',
         '--output',
@@ -190,21 +182,17 @@ def parse_args():
         action='store_true',
         help='Use the clipboard instead of input provided. filename is optional if this is passed'
     )
-    args = parser.parse_args()
+    return parser.parse_args()
+
+def parse_args():
+    args = get_args(False)
     if args.clipboard:
         args.filename = clipboard.paste()
         if args.filename == '':
             print(f'{program_name}: error: clipboard is an invalid input: {args.filename!r}', file = sys.stderr)
             sys.exit(1)
         return args
-    remove_argument(parser, 'filename')
-    parser.add_argument(
-        'filename',
-        type=str,
-        help='The name of the input file'
-    )
-    args = parser.parse_args()
-    return args
+    return get_args(True)
 
 def is_url(filename: str) -> bool:
     return filename.startswith('https://') or filename.startswith('http://')
