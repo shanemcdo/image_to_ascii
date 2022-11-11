@@ -188,8 +188,11 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+def is_url(filename: str) -> bool:
+    return filename.startswith('https://') or filename.startswith('http://')
+
 def get_image(filename: str) -> Image:
-    if filename.startswith('https://') or filename.startswith('http://'):
+    if is_url(filename):
         file = TemporaryFile()
         res = requests.get(filename)
         if res.status_code != 200:
@@ -197,6 +200,7 @@ def get_image(filename: str) -> Image:
         file.write(res.content)
     else:
         file = filename
+    print(f'{file = }')
     return Image.open(file)
 
 def main():
