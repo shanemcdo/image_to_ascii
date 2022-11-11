@@ -15,6 +15,20 @@ SHORT_SPARSE_TO_DENSE = ' .:-=+*#%@'
 RESET_FORMATTING = '\033[0m'
 
 
+def remove_argument(parser: argparse.ArgumentParser, arg: str):
+    '''https://stackoverflow.com/questions/32807319/disable-remove-argument-in-argparse'''
+    for action in parser._actions:
+        opts = action.option_strings
+        if (opts and opts[0] == arg) or action.dest == arg:
+            parser._remove_action(action)
+            break
+    for action in parser._action_groups:
+        for group_action in action._group_actions:
+            if group_action.dest == arg:
+                action._group_actions.remove(group_action)
+                return
+
+
 def hide_cursor():
     print('\033[?25l', end='')
 
@@ -183,6 +197,7 @@ def parse_args():
             print(f'{program_name}: error: clipboard is an invalid input: {args.filename!r}', file = sys.stderr)
             sys.exit(1)
         return args
+    remove_argument(parser, 'filename')
     parser.add_argument(
         'filename',
         type=str,
