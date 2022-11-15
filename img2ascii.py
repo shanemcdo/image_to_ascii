@@ -10,10 +10,15 @@ from PIL import Image, ImageOps
 from time import sleep
 from tempfile import TemporaryFile
 
+PROGRAM_NAME = 'img2ascii'
 LONG_SPARSE_TO_DENSE_SCALE = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
 SHORT_SPARSE_TO_DENSE_SCALE = ' .:-=+*#%@'
 EXTENDED_SCALE = ' ░▒▓█'
 RESET_FORMATTING = '\033[0m'
+
+def die(message: str, code: int = 1):
+    print(f'{PROGRAM_NAME}: \033[1;31merror:\033[0m \033[1;37m{message}{RESET_FORMATTING}', file = sys.stderr)
+    sys.exit(code)
 
 def hide_cursor():
     print('\033[?25l', end='')
@@ -201,10 +206,14 @@ def get_args(require_filename: bool) -> argparse.Namespace:
 
 def parse_args():
     args = get_args(False)
+    if args.extended and args.basic:
+        die('extended and basic flags conflict')
+    if args.color and (args.extended or args.basic):
+        die(f'color and {"extended" if args.extended else "basic"} flags conflict')
     if args.clipboard:
         args.filename = clipboard.paste()
         if args.filename == '':
-            print(f'{program_name}: error: clipboard is an invalid input: {args.filename!r}', file = sys.stderr)
+            die(f'clipboard is an invalid input: {args.filename!r}')
             sys.exit(1)
         return args
     return get_args(True)
