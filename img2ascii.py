@@ -182,6 +182,12 @@ def get_args(require_filename: bool) -> argparse.Namespace:
         action='store_true',
         help='Use the clipboard instead of input provided. filename is optional if this is passed'
     )
+    parser.add_argument(
+        '-f',
+        '--one-frame',
+        action='store_true',
+        help='Override gif and make it only show the first frame of the gif'
+    )
     return parser.parse_args()
 
 def parse_args():
@@ -211,7 +217,7 @@ def get_image(filename: str) -> Image:
 def main():
     args = parse_args()
     img = get_image(args.filename)
-    if not getattr(img, 'is_animated', False):
+    if not getattr(img, 'is_animated', False) or args.one_frame:
         convert_image(img, args)
     else:
         convert_gif(img, args)
