@@ -10,8 +10,9 @@ from PIL import Image, ImageOps
 from time import sleep
 from tempfile import TemporaryFile
 
-LONG_SPARSE_TO_DENSE = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
-SHORT_SPARSE_TO_DENSE = ' .:-=+*#%@'
+LONG_SPARSE_TO_DENSE_SCALE = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
+SHORT_SPARSE_TO_DENSE_SCALE = ' .:-=+*#%@'
+EXTENDED_SCALE = ' ░▒▓█'
 RESET_FORMATTING = '\033[0m'
 
 def hide_cursor():
@@ -75,7 +76,9 @@ def convert_to_ascii(img: Image, args) -> str:
     if args.color:
         return convert_to_ascii_color(img)
     else:
-        ascii_scale = SHORT_SPARSE_TO_DENSE if args.basic else LONG_SPARSE_TO_DENSE
+        if args.extended: ascii_scale = EXTENDED_SCALE
+        elif args.basic: ascii_scale = SHORT_SPARSE_TO_DENSE_SCALE
+        else: ascii_scale = LONG_SPARSE_TO_DENSE_SCALE
         return convert_to_ascii_grayscale(
             img,
             ascii_scale[::-1] if args.reverse else ascii_scale
@@ -142,8 +145,14 @@ def get_args(require_filename: bool) -> argparse.Namespace:
     parser.add_argument(
         '-b',
         '--basic',
-        action="store_true",
+        action='store_true',
         help='Use more basic ascii scale'
+    )
+    parser.add_argument(
+        '-e',
+        '--extended',
+        action='store_true',
+        help='Use the extended ascii scale.'
     )
     parser.add_argument(
         '-r',
